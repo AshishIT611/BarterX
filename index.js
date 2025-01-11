@@ -1,119 +1,60 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-
-const PORT = 8050;
-
-const logRequest = (req) => {
-    const logMessage = `[${new Date().toISOString()}] ${req.method} ${req.url}\n`;
-    fs.appendFile('log.txt', logMessage, (err) => {
-        if (err) console.error('Error logging request:', err);
-    });
-};
-
-const server = http.createServer((req, res) => {
-    logRequest(req);
-
-    switch (req.url) {
-        case '/':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Welcome to the BarterX');
-            break;
-
-        case '/products':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Here are the products up for Sale in BarterX');
-            break;
-
-        case '/login':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Login to the BarterX');
-            break;
-
-        case '/signup':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Sign up to the BarterX');
-            break;
-
-        case '/profile':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Trader Profile');
-            break;
-
-        case '/cart':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Your Shopping Cart is here');
-            break;
-
-        case '/checkout':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end("Let's start shipping");
-            break;
-
-        case '/orders':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Your Orders are here');
-            break;
-
-        case '/categories':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Browse Categories');
-            break;
-
-        case '/chat':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Your Chat with fellow Traders');
-            break;
-
-        case '/contact':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('Contact Us at');
-            break;
-
-        case '/about':
-            fs.readFile(path.join(__dirname, 'public', 'about.html'), (err, content) => {
-                if (err) {
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end('Internal Server Error');
-                } else {
-                    res.writeHead(200, { 'Content-Type': 'text/html' });
-                    res.end(content);
-                }
-            });
-            break;
-
-        case '/api/products':
-            res.writeHead(200, { "Content-Type": "application/json" });
-            let products = [
-                { "id": 1, "name": "Used Laptop", "price": 300 },
-                { "id": 2, "name": "Second-hand Bicycle", "price": 50 }
-            ];
-            res.end(JSON.stringify(products));
-            break;
-
-        case '/logo.png':
-            fs.readFile(path.join(__dirname, 'public', 'logo.png'), (err, content) => {
-                if (err) {
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end('Internal Server Error');
-                } else {
-                    res.writeHead(200, { 'Content-Type': 'image/png' });
-                    res.end(content);
-                }
-            });
-            break;
-
-        default:
-            res.writeHead(404, { "Content-Type": "application/json" });
-            let payload = {
-                "error": "Page not found",
-                "statusCode": 404
-            };
-            res.end(JSON.stringify(payload));
-            break;
-    }
+const fs=require("fs");
+const server=Bun.serve({
+    port:8050,
+    fetch(req){
+        const url=new URL(req.url);
+        const method=req.method;  
+        const timestamp=new Date().toISOString(); 
+        const logMessage=`[${timestamp}] ${method} ${url.pathname}\n`;
+        fs.appendFileSync("log.txt", logMessage);
+        switch (url.pathname){
+            case "/":
+                return new Response("Welcome to BarterX");
+            case "/products":
+                return new Response("Here are the products up for sale in BarterX");
+            case "/login":
+                return new Response("Login to BarterX");
+            case "/signup":
+                return new Response("Sign up to BarterX");
+            case "/profile":
+                return new Response("Trader Profile");
+            case "/cart":
+                return new Response("Your Shopping Cart is here");
+            case "/checkout":
+                return new Response("Let's start shipping");
+            case "/orders":
+                return new Response("Your Orders are here");
+            case "/api/products":
+                const apiData=[
+                    {id:1,name:"Used Laptop",price:300},
+                    {id:2,name:"Second-hand Bicycle",price:50},
+                ];
+                return new Response(JSON.stringify(apiData),{
+                    headers:{"Content-Type":"application/json"},
+                });
+            case "/categories":
+                return new Response("Browse Categories");
+            case "/chat":
+                return new Response("Your Chat with fellow Traders");
+            case "/contact":
+                return new Response("Contact Us at");
+            case "/about":
+                return new Response(Bun.file("./public/about.html"),{
+                    headers:{"Content-Type":"text/html"},
+                });
+            case "/styles":
+                return new Response(Bun.file("./public/styles.css"),{
+                    headers:{"Content-Type":"text/css"},
+                });
+            default:
+                return Response.json(
+                    {error:"Page not found",statusCode:404},
+                    {
+                        status:404,
+                        headers:{"Content-Type":"application/json"},
+                    }
+                );
+        }
+    },
 });
-
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+console.log(`Server is running at  http://localhost:${server.port}`);
