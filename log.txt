@@ -110,3 +110,12 @@
 2025-01-10T06:08:42.338Z-GET Request at /contact
 2025-01-10T06:08:42.399Z-GET Request at /about
 2025-01-10T06:08:42.447Z-GET Request at /404
+2025-01-10T07:53:03.941Z-GET Request at /
+2025-01-10T07:53:04.090Z-GET Request at /favicon.ico
+2025-01-10T07:53:08.885Z-GET Request at /products
+2025-01-10T07:53:26.380Z-GET Request at //api/products
+2025-01-10T07:53:34.065Z-GET Request at /api/products
+[2025-01-10T08:42:49.518Z] GET /
+[2025-01-10T08:42:49.638Z] GET /favicon.ico
+[2025-01-10T08:49:22.316Z] GET /about
+[2025-01-10T08:50:34.049Z] GET /404
